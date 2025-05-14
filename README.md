@@ -19,7 +19,7 @@ This project contains two components:
 7. cd into gocrypter/stub
 8. `go build -ldflags="-s -w" -trimpath -o stub.exe` 
 (or if you're building an ELF binary)
-`GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -trimpath -o stub)
+ `GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -trimpath -o stub`
 9. Done!
 
 ## Features
