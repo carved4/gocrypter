@@ -17,7 +17,9 @@ This project contains two components:
 5. To use crypter: `go run main.go example.exe` (whatever the name of the binary you put in crypt, obviously)
 6. Then, the files encrypted_Input.bin and key.txt will be created in the gocrypter/stub directory
 7. cd into gocrypter/stub
-8. `go build -ldflags="-s -w" -trimpath -o stub.exe` (or if you're building an ELF binary, just "stub")
+8. `go build -ldflags="-s -w" -trimpath -o stub.exe` 
+(or if you're building an ELF binary)
+`GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -trimpath -o stub)
 9. Done!
 
 ## Features
