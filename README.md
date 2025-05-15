@@ -25,7 +25,7 @@ This project contains two components:
 ## Features
 
 - Encryption/Decryption: ChaCha20 stream cipher
-- Memory Execution: [github.com/wrwrabbit/go-memexec](https://pkg.go.dev/github.com/wrwrabbit/go-memexec)
+- Memory Execution: [github.com/amenzhinsky/go-memexec](https://github.com/amenzhinsky/go-memexec/tree/main)
 - The encrypted file and key are embedded in the stub binary using Go's embed package
 
 ## Security Considerations
