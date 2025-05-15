@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/wrwrabbit/go-memexec"
+	"github.com/amenzhinsky/go-memexec"
 	"golang.org/x/crypto/chacha20"
 )
 
