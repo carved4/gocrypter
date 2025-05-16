@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"os"
-	"path/filepath"
+
 
 	"golang.org/x/crypto/argon2"
 	"golang.org/x/crypto/chacha20poly1305"
