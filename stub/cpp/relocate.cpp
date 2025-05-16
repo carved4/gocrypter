@@ -8,7 +8,7 @@
 
 // Page size for Windows (4KB)
 #define PAGE_SIZE 4096
-
+    
 // Get the PE data directory
 static IMAGE_DATA_DIRECTORY* getPeDir(void* modulePtr, DWORD directoryEntry) {
     IMAGE_DOS_HEADER* dosHeader = (IMAGE_DOS_HEADER*)modulePtr;
@@ -21,7 +21,7 @@ static IMAGE_DATA_DIRECTORY* getPeDir(void* modulePtr, DWORD directoryEntry) {
     return &ntHeaders->OptionalHeader.DataDirectory[directoryEntry];
 }
 
-// Process relocations for a single page
+// process relocations for a single page
 static bool processRelocEntry(
     BYTE* modulePtr,
     SIZE_T moduleSize,
@@ -72,7 +72,7 @@ static bool processRelocEntry(
 
 // Apply base relocations to a PE module
 bool applyReloc(uint64_t newBase, uint64_t oldBase, void* modulePtr, SIZE_T moduleSize) {
-    // Validate inputs
+    // validate inputs
     if (!modulePtr || moduleSize < sizeof(IMAGE_DOS_HEADER)) {
         LOG_ERROR("Invalid module pointer or size");
         return false;
@@ -82,7 +82,7 @@ bool applyReloc(uint64_t newBase, uint64_t oldBase, void* modulePtr, SIZE_T modu
         return false;
     }
 
-    // Validate PE headers
+    // validate pe headers
     IMAGE_DOS_HEADER* dosHeader = (IMAGE_DOS_HEADER*)modulePtr;
     if (dosHeader->e_magic != IMAGE_DOS_SIGNATURE) {
         LOG_ERROR("Invalid DOS signature");
@@ -96,7 +96,7 @@ bool applyReloc(uint64_t newBase, uint64_t oldBase, void* modulePtr, SIZE_T modu
         return false;
     }
 
-    // Get relocation directory
+    // get relocation directory
     IMAGE_DATA_DIRECTORY* relocDir = getPeDir(modulePtr, IMAGE_DIRECTORY_ENTRY_BASERELOC);
     if (!relocDir || relocDir->VirtualAddress == 0 || relocDir->Size == 0) {
         LOG_ERROR("No relocation directory found");
@@ -113,12 +113,12 @@ bool applyReloc(uint64_t newBase, uint64_t oldBase, void* modulePtr, SIZE_T modu
     SIZE_T parsedSize = 0;
     SIZE_T maxSize = relocDir->Size;
 
-    // Process relocation blocks
+    // process relocation blocks
     while (parsedSize < maxSize) {
         IMAGE_BASE_RELOCATION* reloc = (IMAGE_BASE_RELOCATION*)(relocBase + parsedSize);
         if (reloc->SizeOfBlock == 0) break;
 
-        // Validate block size
+        // validate block size
         if (parsedSize + reloc->SizeOfBlock > maxSize) {
             LOG_ERROR("Invalid relocation block size at offset 0x%zx", parsedSize);
             return false;
@@ -128,8 +128,8 @@ bool applyReloc(uint64_t newBase, uint64_t oldBase, void* modulePtr, SIZE_T modu
         int entries = (reloc->SizeOfBlock - sizeof(IMAGE_BASE_RELOCATION)) / sizeof(WORD);
         WORD* entry = (WORD*)((BYTE*)reloc + sizeof(IMAGE_BASE_RELOCATION));
 
-        // Calculate page boundaries for this block
-        SIZE_T pageStartRva = page & ~(PAGE_SIZE - 1); // Align to page start
+        // calculate page boundaries for this block
+        SIZE_T pageStartRva = page & ~(PAGE_SIZE - 1); // align to page start
         SIZE_T maxOffset = 0;
         for (int i = 0; i < entries; i++) {
             WORD offset = entry[i] & 0x0FFF;
@@ -139,26 +139,26 @@ bool applyReloc(uint64_t newBase, uint64_t oldBase, void* modulePtr, SIZE_T modu
         SIZE_T protectSize = ((pageEndRva + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1)) - pageStartRva;
         BYTE* pageStartAddr = (BYTE*)modulePtr + pageStartRva;
 
-        // Skip empty blocks
+        // skip empty blocks
         if (entries == 0) {
             parsedSize += reloc->SizeOfBlock;
             continue;
         }
 
-        // Protect the entire page range for this block
+        // protect the entire page range for this block
         DWORD oldProtect;
         if (!VirtualProtect(pageStartAddr, protectSize, PAGE_READWRITE, &oldProtect)) {
             LOG_ERROR("Failed to change memory protection for page at RVA 0x%zx", pageStartRva);
             return false;
         }
 
-        // Process relocation entries
+        // process relocation entries
         for (int i = 0; i < entries; i++) {
             WORD typeOffset = entry[i];
             WORD type = typeOffset >> 12;
             WORD offset = typeOffset & 0x0FFF;
 
-            // Skip absolute relocations early
+            // skip absolute relocations early
             if (type == IMAGE_REL_BASED_ABSOLUTE) continue;
 
             if (!processRelocEntry(static_cast<BYTE*>(modulePtr), moduleSize, page, type, offset, oldBase, newBase)) {
@@ -167,7 +167,7 @@ bool applyReloc(uint64_t newBase, uint64_t oldBase, void* modulePtr, SIZE_T modu
             }
         }
 
-        // Restore original protection
+        // restore original protection
         VirtualProtect(pageStartAddr, protectSize, oldProtect, &oldProtect);
 
         parsedSize += reloc->SizeOfBlock;
