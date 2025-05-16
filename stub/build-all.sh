@@ -27,3 +27,17 @@ fi
 echo "Build completed successfully!"
 echo "Output binary: stub.exe"
 
+# Clean up sensitive files after successful build
+echo "Cleaning up sensitive files..."
+if [ -f "encrypted_Input.bin" ]; then
+    rm -f encrypted_Input.bin
+    echo "Removed encrypted_Input.bin"
+fi
+
+if [ -f "config.txt" ]; then
+    rm -f config.txt
+    echo "Removed config.txt"
+fi
+
+echo "Cleanup completed."
+

