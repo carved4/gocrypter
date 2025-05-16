@@ -22,7 +22,7 @@ ACTUAL in memory execution of the encrypted file. (no go memexec bullshit droppi
 ## Features
 
 - Encryption/Decryption: ChaCha20 stream cipher
-- Memory Execution: stub/cpp and internal/runpe/runpe.go
+- Memory Execution: stub/cpp and internal/runpe/runpe.go (relocation, process hollowing, will compile for any EXE im pretty sure, but if not let me know)
 - The encrypted file and key are embedded in the stub binary using Go's embed package
 
 ## Security Considerations
