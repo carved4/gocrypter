@@ -1,7 +1,5 @@
 # gocrypter - an implementation of https://github.com/Amaop/Rust-Crypter in golang with ChaCha20 instead of AES
 
-(completely cross compatible, rust implementation only accepts x86_64 windows executables)
-
 This project contains two components:
 
 1. **crypt** - A tool to encrypt an executable file using ChaCha20, and turn it into two parts
