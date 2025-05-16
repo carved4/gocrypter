@@ -8,19 +8,22 @@ This project contains two components:
 2. **stub** - a golang binary that embeds, decrypts, and executes the encrypted file directly in memory using a custom implementation of PE exec with process hollowing and a custom PE loader, which is also embedded in the stub binary to perform the
 ACTUAL in memory execution of the encrypted file. (no go memexec bullshit dropping to /temp)
 
-NOTE: Limitations & Requirements
+## NOTE: Limitations & Requirements
 
-[+] Relocations are not handled currently, execution relies on luck and alignment [+]
+**[+] Relocations are _not_ handled currently, execution relies on memory alignment and luck**
 
-To avoid crashes and broken payloads:
-	•	Your payload must be a statically linked binary, ideally written in Go or Rust
-	•	If the process you’re hollowing has full ASLR enabled (e.g., /DYNAMICBASE set), this will likely fail
-	•	Most Microsoft-signed binaries (like OneDrive.exe, notepad.exe, etc.) often don’t fully enforce ASLR, but don’t count on it
-	•	Avoid CGo (Go) and direct Windows API calls (Rust) as they typically trigger additional imports
-	•	Structure your binary to rely only on kernel32.dll
-	•	If you want guaranteed memory availability at your PE’s image base:
-	•	Hollow a suspended process you created — it gives you total control over memory layout
-	•	If you need broader support for dynamic binaries or relocations, use gocrypter with go-memexec instead it’s not pure in-memory, but it’s more forgiving (i will include link to old repo soon)
+To avoid crashes and maximize compatibility:
+
+- Your payload **should be a statically linked binary**, preferably written in **Go** or **Rust**
+- If the process you're hollowing has **full ASLR enabled** (e.g., `/DYNAMICBASE` flag set), this will likely **fail**
+  - Most Microsoft-signed binaries (e.g., `OneDrive.exe`, `notepad.exe`) often have partial ASLR, but **don’t count on it**
+- Avoid:
+  - Using **CGo** (in Go projects)
+  - Direct **WinAPI calls** (especially in Rust,they're hard to avoid and expand your import table)
+- Ideally, structure your binary to rely **only on `kernel32.dll`**
+- For best results:
+  - **Hollow a suspended process you spawned yourself**, so you control the memory layout and avoid base address collisions
+- If you need a more robust alternative that doesn't execute strictly in memory but handles relocations and imports, try my original [`gocrypter`](https://github.com/carved4/gocrypter) that uses `go-memexec` 
 
 ## How to Use
 1. Clone the repository 
