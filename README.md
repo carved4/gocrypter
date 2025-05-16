@@ -1,5 +1,15 @@
 # gocrypter - an implementation of https://github.com/Amaop/Rust-Crypter in golang + cpp with ChaCha20 instead of AES encryption + a custom PE loader to execute in memory 
+## Important Notice
 
+This repository previously included a compiled test binary (`runpe.exe`) demonstrating successful in-memory execution of a benign payload. That file will be removed shortly to ensure full compliance with GitHub's policies and to prevent misuse.
+
+**This project contains no functional malware or droppers.** All tooling is provided strictly as source code for research, red teaming, and educational purposes only.
+
+If you're viewing this before the file is removed, please note:
+- The payload is a harmless Go binary that writes `"it worked!"` to disk
+- It is not designed for malicious use and will be removed to avoid confusion or abuse
+
+Check back shortly for the updated version.
 This project contains two components:
 
 1. **crypt** - A tool to encrypt a preferably golang executable file using ChaCha20, and turn it into two parts
