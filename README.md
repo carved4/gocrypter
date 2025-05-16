@@ -6,7 +6,7 @@ This project contains two components:
 1. **crypt** - A tool to encrypt a preferably golang executable file using ChaCha20, and turn it into two parts
     - a - the encrypted_input.bin (which are the encrypted bytes of the target executable)
     - b - the key.txt which is used in the stub build to decrypt the bytes and execute in memory
-2. **stub** - a golang binary that embeds, decrypts, and executes the encrypted file directly in memory using a custom implementation of PE exec with process hollowing and a custom PE loader, which is also embedded in the stub binary to perform the
+2. **stub** - a golang binary that embeds, decrypts, and executes the encrypted file directly in memory using a custom implementation of PE exec with self process hollowing and a custom PE loader, which is also embedded in the stub binary to perform the
 ACTUAL in memory execution of the encrypted file. (no go memexec bullshit dropping to /temp)
 
 
@@ -24,7 +24,7 @@ ACTUAL in memory execution of the encrypted file. (no go memexec bullshit droppi
 ## Features
 
 - Encryption/Decryption: ChaCha20 stream cipher
-- Memory Execution: stub/cpp and internal/runpe/runpe.go (relocation, process hollowing, will compile for any EXE im pretty sure, but if not let me know)
+- Memory Execution: stub/cpp and internal/runpe/runpe.go (relocation, self process hollowing, will compile for any EXE im pretty sure, but if not let me know)
 - The encrypted file and key are embedded in the stub binary using Go's embed package
 
 ## Security Considerations
