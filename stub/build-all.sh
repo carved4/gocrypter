@@ -39,5 +39,9 @@ if [ -f "config.txt" ]; then
     echo "Removed config.txt"
 fi
 
-echo "Cleanup completed."
+if [ -f "librunpe.a" ]; then
+    rm -f librunpe.a
+    echo "Removed librunpe.a"
+fi
 
+echo "Cleanup completed."
