@@ -1,4 +1,4 @@
-# gocrypter - an implementation of https://github.com/Amaop/Rust-Crypter in golang with ChaCha20 instead of AES
+# gocrypter - an implementation of https://github.com/Amaop/Rust-Crypter in golang + cpp with ChaCha20 instead of AES encryption + a custom PE loader to execute in memory 
 
 This project contains two components:
 
