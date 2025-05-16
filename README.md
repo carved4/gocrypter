@@ -49,5 +49,4 @@ While significantly improved, this is still a basic implementation and may not b
 ## Example Usage with Go Binary that writes "it worked" to current dir
 
 
-https://github.com/user-attachments/assets/b0a5e1dd-6e37-41ac-8564-c578c754fdba
 
