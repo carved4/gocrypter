@@ -35,6 +35,8 @@ This is a basic implementation and may not be suitable for production use withou
 - The key is stored in plaintext within the stub binary
 - No anti-debugging or VM detection mechanisms are implemented
 
-## Example Results
+## Example Usage with Go Binary that writes "it worked" to current dir
 
+
+https://github.com/user-attachments/assets/b0a5e1dd-6e37-41ac-8564-c578c754fdba
 
