@@ -7,7 +7,8 @@ This project contains two components:
 1. **crypt** - A tool to encrypt an executable file using ChaCha20, and turn it into two parts
     - a - the encrypted_input.bin (which are the encrypted bytes of the target executable)
     - b - the key.txt which is used in the stub build to decrypt the bytes and execute in memory
-2. **stub** - a golang binary that embeds, decrypts, and executes the encrypted file directly in memory using go-memexec 
+2. **stub** - a golang binary that embeds, decrypts, and executes the encrypted file directly in memory using go-memexec
+   (NOTE - this memexec package WRITES TO DISK unfortunately, it is quite stealthy as a loader/dropper still, though)
 
 ## How to Use
 1. Clone the repository 
