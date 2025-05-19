@@ -1,5 +1,7 @@
 # gocrypter - an implementation of https://github.com/Amaop/Rust-Crypter in golang + cpp with ChaCha20-Poly1305 authenticated encryption + a custom PE loader to execute in memory 
-## Important Notice
+
+## Notice
+feel free to open issues or DM with feedback or use cases!
 
 This project contains two components:
 
