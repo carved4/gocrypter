@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "=== go curl memexec builder ==="
+echo "=== builder ==="
 
 # Make sure the script is executable
 chmod +x build.sh
